@@ -1,0 +1,61 @@
+{
+  "schema_version": "dataset-catalog-v3",
+  "generated_at": "2026-09-28T19:04:00.733585+00:00",
+  "sources": {
+    "huatuo_cardio": {
+      "active_rows": 370,
+      "reported_filter_rows": 374,
+      "removed_or_missing_ids": [
+        "12481497",
+        "4202264",
+        "4264921",
+        "4541910"
+      ],
+      "source_sha256": "8db5f1f22e66750d3512828ae52786f77b2a048af29b0e233c8e093346545151",
+      "active_file_sha256": "ac7faeeadc5a8d2a3d6df47e8b17cd178f197254e4a11bacd18c889857aedca8",
+      "candidate_manifest": "data\\verified\\huatuo_cardio\\candidate_manifest.json"
+    },
+    "medical_dialogue": {
+      "canonical_rows": 659,
+      "sft_rows": 785,
+      "format_review_rows": 272,
+      "normalization_review_rows": 426
+    },
+    "ragcare": {
+      "raw_rows": 420,
+      "golden_rows": 32,
+      "qrels": 96,
+      "processed_bilingual_rows": 25
+    },
+    "knowledge": {
+      "chunks": 28898,
+      "evidence_items": 28898,
+      "pending_rows": 28898,
+      "translated_rows": 10516
+    },
+    "drugs": {
+      "source_rows": 3925,
+      "complete_output_rows": 740,
+      "partial_rows": 985,
+      "partial_exists": true,
+      "cache_exists": true,
+      "status": "in_progress",
+      "complete_output_sha256": "fcc45ee04dd2fd4b74dfe5763d400fc825a29f3f1aa53e4a53cb234fb897df35",
+      "remaining_source_rows_by_complete_output": 3185
+    },
+    "evaluation": {
+      "judge_cases": 32,
+      "safety_cases": 38,
+      "privacy_cases": 76
+    },
+    "agent": {
+      "intent_entity_cases": 105,
+      "memory_sessions": 36
+    }
+  },
+  "policy": {
+    "medical_truth_verified_fields_unchanged": true,
+    "partial_files_deleted": false,
+    "synthetic_data_is_not_authoritative": true
+  }
+}

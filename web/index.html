@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>心血管对话</title><link rel="stylesheet" href="/styles.css?v=chat-browser-1">
+  <link rel="stylesheet" href="/chat.css?v=chat-compact-2">
+  <script>if(location.protocol==='file:'){document.addEventListener('DOMContentLoaded',()=>{document.body.replaceChildren();const p=document.createElement('p');p.textContent='请先运行 scripts/start_app.ps1，再通过服务地址打开完整界面。直接打开 HTML 无法使用样式、附件和后端接口。';const a=document.createElement('a');a.href='http://127.0.0.1:8000/';a.textContent='打开心血管研究台';document.body.append(p,a);});}</script>
+</head>
+<body>
+<header class="app-header">
+  <div class="brand-group"><button id="toggleHistory" class="icon-button" aria-controls="historySidebar" aria-expanded="true" aria-label="收起历史对话">☰</button><button id="brandLogo" class="brand-mark" aria-label="心血管对话 Logo">心</button><h1>心血管对话</h1></div>
+  <div class="identity-group"><span id="visitorLabel">正在连接…</span><button id="clearUserCookies" class="quiet" disabled>清除用户 Cookie</button></div>
+</header>
+<div id="pageNotice" class="page-notice" role="status" hidden></div>
+<main class="shell" id="appShell">
+  <button id="historyBackdrop" class="history-backdrop" aria-label="关闭历史对话" hidden></button>
+  <aside class="history-sidebar" id="historySidebar" aria-label="历史对话">
+    <button id="newSession" class="new-conversation">＋ 新对话</button>
+    <div class="history-heading"><h2>历史对话</h2><button id="refreshHistory" class="text-button">刷新</button></div>
+    <div id="historyList" class="history-list" aria-live="polite"><p class="hint">正在读取历史…</p></div>
+    <p class="history-note">这个浏览器就是你的访客身份。<br>无需登录，刷新后仍可继续对话。</p>
+  </aside>
+  <section class="workspace">
+    <section id="researchDesk" class="research-desk" aria-label="研究台" hidden>
+      <div class="research-heading"><div><strong>研究台</strong><p>本机调试面板，不是账户权限。病例为共享研究资料。</p></div><button id="closeResearch" class="quiet">返回普通界面</button></div>
+      <nav aria-label="研究工作区"><button class="nav-button active" data-view="chat">对话与证据</button><button class="nav-button" data-view="cases">病例档案</button><button class="nav-button" data-view="evaluations">评测记录</button></nav>
+      <details><summary>模型、索引与工具状态</summary><div id="runtimeStatus" class="runtime-status">正在读取服务状态…</div><button id="refreshStatus" class="quiet">刷新状态</button></details>
+      <div class="research-cookie-row"><span>研究台设置单独保存在 Cookie 中，不包含对话内容。</span><button id="clearResearchCookies" class="text-button">清除研究台 Cookie</button></div>
+    </section>
+    <header class="topbar"><strong id="viewTitle">新对话</strong><div class="topbar-actions"><span id="sessionLabel" class="session-pill">尚未发送消息</span><button id="toggleTimeline" class="quiet" aria-controls="timelineSidebar" aria-expanded="false">显示时间轴</button></div></header>
+    <section id="chatView" class="view">
+      <div class="context-bar research-only">
+        <label>关联病例 <select id="caseSelect"><option value="">不关联病例</option></select></label>
+        <p class="hint">访客身份由 Cookie 自动管理，无需填写用户标识。</p>
+      </div>
+      <div class="content-grid timeline-hidden" id="chatLayout">
+        <section class="chat-panel">
+          <div class="intro" id="chatIntro"><span class="intro-mark" aria-hidden="true">心</span><h2>从一个问题开始</h2><p>聊聊心血管知识，或上传报告核对文字。<br>回答会附上可用的资料来源。</p><button type="button" class="suggestion" id="exampleQuestion">房颤的常见检查有哪些？</button></div>
+          <div id="messages" class="messages" role="log" aria-label="对话消息" aria-live="polite"></div>
+          <form id="chatForm" class="composer">
+            <details id="attachmentDrawer"><summary>＋ 添加报告或参考资料 <span class="hint">图片 / PDF / TXT</span></summary>
+            <section id="attachmentDrop" class="attachment-upload" aria-label="上传附件">
+              <label>添加报告或参考资料<input id="attachmentInput" type="file" accept=".png,.jpg,.jpeg,.pdf,.txt" multiple></label>
+              <p class="hint">可拖入文件。最多 3 个文件、每个 20 MB，共 20 页；24 小时后清理。原图只在本机解析。</p>
+              <div class="attachment-options"><label>资料用途<select id="attachmentPurpose"><option value="patient_context">患者资料（上下文）</option><option value="reference">参考资料（会话证据）</option></select></label><label>PDF 页码（可选）<input id="attachmentPages" placeholder="例如 1,2,5"></label></div>
+              <div id="attachmentState" role="status"></div>
+              <div id="attachmentList"></div>
+            </section>
+            </details>
+            <label class="sr-only" for="messageInput">输入研究问题</label>
+            <textarea id="messageInput" rows="1" placeholder="例如：房颤的常见检查有哪些？" maxlength="4000" required></textarea>
+            <label class="check research-only"><input type="checkbox" id="supplement">允许一般模型知识补充（显式标记，不能代替本地证据）</label>
+            <label class="check"><input type="checkbox" id="networkMode" checked>联网补充资料 <span class="hint">仅发送脱敏医学查询</span></label>
+            <div class="composer-footer"><span id="requestState" role="status">Enter 发送 · Shift + Enter 换行</span><div><button type="button" id="cancelChat" class="quiet" hidden>取消等待</button><button id="sendChat" type="submit">发送问题</button></div></div>
+          </form>
+        </section>
+        <aside class="evidence-panel" id="timelineSidebar" aria-label="对话时间轴" hidden>
+          <section id="conversationTimeline" class="timeline-panel"><div class="timeline-heading"><h2>对话时间轴 <span id="timelineCount">0 条消息</span></h2><button id="hideTimeline" class="text-button" aria-label="隐藏对话时间轴">隐藏</button></div><ol id="conversationEvents" class="conversation-events"></ol><p id="timelineEmpty" class="hint">发送第一条消息后，这里会记录对话时间和工具步骤。</p><div id="toolTimeline"></div></section>
+          <div id="answerStatus" class="answer-status" hidden></div>
+          <div id="answerDebug" class="answer-status research-only" hidden></div>
+          <div id="attachmentRefs" class="hint" hidden></div>
+          <div id="evidenceState" class="empty-evidence" hidden></div>
+          <details id="tracePanel" class="research-only"><summary>本轮执行追踪</summary><div id="traceState">回答后可查看路由、工具与节点耗时。</div></details>
+          
+        </aside>
+      </div>
+    </section>
+    <section id="casesView" class="view management" hidden>
+      <div class="section-title"><div><h2>病例档案</h2><p>选择病例后，已录入的用药、检查和病史会进入对话上下文。</p></div><button id="newCase">新建病例</button></div>
+      <div class="case-layout"><div id="caseList" class="case-list"></div>
+        <form id="caseForm">
+          <h3 id="caseTitle">新建病例</h3>
+          <label>病例业务字段（JSON）<textarea id="caseEditor" rows="20" spellcheck="false" required></textarea></label>
+          <p class="hint">可编辑 age、chief_complaint、medications、lab_results 等字段；身份字段由系统维护。</p>
+          <div class="actions"><button type="submit">保存病例</button><button type="button" id="bindCase" class="quiet" disabled>关联到对话</button><button type="button" id="deleteCase" class="quiet" disabled>删除病例</button></div>
+          <p id="caseStatus" role="status"></p>
+        </form>
+      </div>
+    </section>
+    <section id="evaluationsView" class="view management" hidden>
+      <div class="section-title"><div><h2>评测记录</h2><p>检索模式不调用生成、Judge 或在线重排；完整模式可能消耗 API 额度。</p></div></div>
+      <form id="evaluationForm" class="evaluation-controls">
+        <label>套件<select id="evalSuite"><option value="ragcare">RAGCare 检索</option><option value="safety">安全边界</option><option value="judge">五维 Judge</option><option value="all">全部</option></select></label>
+        <label>模式<select id="evalMode"><option value="retrieval_only">只测检索</option><option value="full">完整流程</option></select></label>
+        <label>样例数<input id="evalCount" type="number" min="1" max="500" value="5"></label>
+        <label class="check"><input type="checkbox" id="evalJudge">调用真实 Judge</label>
+        <button id="runEvaluation" type="submit">运行评测</button>
+      </form>
+      <p id="evalProgress" role="status">尚未运行评测。</p>
+      <div id="evalMetrics"></div>
+      <details><summary>逐条结果与失败原因</summary><pre id="evalDetails">运行完成后显示。</pre></details>
+      <label>恢复记录<input id="evalRunId" placeholder="填入 run_id"></label><button id="loadEvaluation" class="quiet">读取记录</button>
+    </section>
+  </section>
+</main>
+<script src="/app.js?v=chat-language-3"></script>
+<script src="/browser.js?v=chat-compact-2"></script>
+<script src="/attachments.js?v=chat-browser-1"></script>
+</body>
+</html>
+

@@ -1,0 +1,52 @@
+services:
+  api:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      APP_ENV: local
+      REDIS_URL: redis://redis:6379/0
+      CHROMA_HOST: chroma
+      CHROMA_PORT: "8000"
+      LLM_BACKEND: ${LLM_BACKEND:-mock}
+      AIHUBMIX_BASE_URL: ${AIHUBMIX_BASE_URL:-https://aihubmix.com/v1}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-deepseek-v4.1-flash}
+      CHROMA_MODE: http
+      DATA_DIR: /app/data/runtime
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      chroma:
+        condition: service_healthy
+
+  redis:
+    image: redis:7.2-alpine
+    expose:
+      - "6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  chroma:
+    image: chromadb/chroma:0.5.23
+    expose:
+      - "8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/api/v1/heartbeat')\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  redis_data:
+  chroma_data:
+

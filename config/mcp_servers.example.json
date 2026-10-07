@@ -1,0 +1,23 @@
+{
+  "servers": [
+    {
+      "name": "optional-public-medical-search",
+      "enabled": false,
+      "read_only": true,
+      "transport": "streamable-http",
+      "url": "https://YOUR-MCP-SERVICE/mcp",
+      "token_env": "MEDICAL_MCP_TOKEN",
+      "tools": {"search_web": "search_web"}
+    },
+    {
+      "name": "optional-local-search-process",
+      "enabled": false,
+      "read_only": true,
+      "transport": "stdio",
+      "command": "YOUR-PYTHON-ABSOLUTE-PATH",
+      "args": ["-m", "your_read_only_mcp_server"],
+      "env_allowlist": ["MEDICAL_SEARCH_KEY"],
+      "tools": {"search_pubmed": "search_pubmed"}
+    }
+  ]
+}
